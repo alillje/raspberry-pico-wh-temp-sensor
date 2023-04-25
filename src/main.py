@@ -8,7 +8,7 @@ import data_transfer
 from blink import blink_lamp
 
 # Connect to WiFi network
-wifi_connector.connect_to_network("Lillje-Luna", "santiagodechile")
+wifi_connector.connect_to_network("<wifi-name>", "<wifi password>")
 i2c = I2C(0, scl=Pin(9), sda=Pin(8), freq=200000)       # Init I2C Using Pins GP8 And GP9 "Default I2C0 Pins"
 led = Pin("LED", Pin.OUT)
 

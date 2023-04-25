@@ -15,24 +15,29 @@ class DHT11:
         self._humidity = -1
 
     def measure(self, retries=3):
-        buffer = None
+        try:
 
-        for _ in range(retries):
-            try:
-                buffer = self._read_data()
-                if buffer is not None:
-                    break
-            except InvalidChecksum:
-                pass
-            utime.sleep_ms(100)
+            buffer = None
 
-        if buffer is None:
-            return None, None
+            for _ in range(retries):
+                try:
+                    buffer = self._read_data()
+                    if buffer is not None:
+                        break
+                except InvalidChecksum:
+                    pass
+                utime.sleep_ms(100)
 
-        self._humidity = buffer[0]
-        self._temperature = buffer[2]
+            if buffer is None:
+                return None, None
 
-        return self._temperature, self._humidity
+            self._humidity = buffer[0]
+            self._temperature = buffer[2]
+
+            return self._temperature, self._humidity
+        except InvalidChecksum:
+            pass
+        utime.sleep_ms(100)
 
     def _send_init_signal(self):
         self._pin.init(Pin.OUT, Pin.PULL_DOWN)

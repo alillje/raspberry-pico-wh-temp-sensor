@@ -10,8 +10,8 @@ def send_data_to_server(temp, hum, time):
     # Send temperature, humidity and time data to a server via a POST request.
     try:
         print("Sending data to server.. ")
-        url = "https://filius.serveo.net/tempdata"
-        headers = {"Content-Type": "application/json", "X-Api-Key": "4scKe87sP1DxsSdWedsa"}
+        url = "<api-url>"
+        headers = {"Content-Type": "application/json", "X-Api-Key": "<api-key>"}
 
         data = {"temperature": temp, "humidity": hum, "timestamp": time}
 
