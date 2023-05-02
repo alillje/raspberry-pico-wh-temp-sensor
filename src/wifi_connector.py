@@ -50,7 +50,7 @@ def get_time_from_internet():
             data = response.json()
             year, month, day = data["year"], data["month"], data["day"]
             hour, minute, seconds, milli_seconds = data["hour"], data["minute"], data["seconds"], data["milliSeconds"]
-            timestamp = f"{year:04d}-{month:02d}-{day:02d}T{hour:02d}:{minute:02d}:{seconds:02d}.{milli_seconds:03d}Z"
+            timestamp = f"{year:04d}-{month:02d}-{day:02d}T{hour:02d}:{minute:02d}:{seconds:02d}.{milli_seconds:03d}"
             # formatted_time = "{:04d}-{:02d}-{:02d}T{:02d}:{:02d}:{:02d}Z".format(year, month, day, hour, seconds, milli_seconds)
 
             return timestamp
