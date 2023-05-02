@@ -10,8 +10,9 @@ def send_data_to_server(temp, hum, time):
     # Send temperature, humidity and time data to a server via a POST request.
     try:
         print("Sending data to server.. ")
-        url = "<api-url>"
-        headers = {"Content-Type": "application/json", "X-Api-Key": "<api-key>"}
+        # Set URL, headers and request body
+        url = "<server-url>"
+        headers = {"Content-Type": "application/json", "X-Api-Key": "<API-Key>"}
 
         data = {"temperature": temp, "humidity": hum, "timestamp": time}
 

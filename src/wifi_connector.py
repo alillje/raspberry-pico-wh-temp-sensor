@@ -4,12 +4,15 @@ import ntptime
 import utime
 
 def connect_to_network(ssid, password):
-    """
-    Connect to the specified WiFi network using the given credentials,
-    and test the internet connection by making an HTTP GET request to Google.
-    """
-    wlan = network.WLAN(network.STA_IF)  # Create WLAN object
-    wlan.active(True)  # Activate the WLAN interface
+    
+    # Connect to the specified WiFi network using the given credentials,
+    # and test the internet connection by making an HTTP GET request to Google.
+
+    # Create WLAN object
+    wlan = network.WLAN(network.STA_IF)
+    
+    # Activate the WLAN interface
+    wlan.active(True)
 
     # Check if the WLAN interface is already connected to a network
     if wlan.isconnected():
