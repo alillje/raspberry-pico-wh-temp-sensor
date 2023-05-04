@@ -12,7 +12,7 @@ def send_data_to_server(temp, hum, time):
         print("Sending data to server.. ")
         # Set URL, headers and request body
         url = "<server-url>"
-        headers = {"Content-Type": "application/json", "X-Api-Key": "<API-Key>"}
+        headers = {"Content-Type": "application/json", "X-Api-Key": "<api-key>"}
 
         data = {"temperature": temp, "humidity": hum, "timestamp": time}
 
@@ -21,12 +21,12 @@ def send_data_to_server(temp, hum, time):
         if response.status_code == 201:
             print("Data sent successfully.")
             # Blink the lamp to indicate sucess
-            blink_lamp(1, 1)
+            blink_lamp(3, 0.5)
     
         else:
             print("Failed to send data. Status code:", response.status_code)
             print(response.content)
-            blink_lamp(5, 0.2)
+            blink_lamp(1, 2)
 
 
         response.close()
@@ -34,4 +34,5 @@ def send_data_to_server(temp, hum, time):
     except Exception as e:
         print("Something went wrong when sending data to the server.")
         print("Error details:", repr(e))
+
 

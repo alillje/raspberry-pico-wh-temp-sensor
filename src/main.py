@@ -7,7 +7,7 @@ from blink import blink_lamp
 
 # Connect to WiFi network
 try:
-    wifi_connector.connect_to_network("<wifi-ssd>", "<wifi-password>")    
+    wifi_connector.connect_to_network("<wifi-ssid>", "<wifi-password>")    
 except:
     print("An error occured connecting to wifi")
 
@@ -16,7 +16,7 @@ led = Pin("LED", Pin.OUT)
 
 
 # Blink the lamp 5 times to confirm startup
-blink_lamp(3, 1)
+blink_lamp(5, 1)
 pin = Pin(28, Pin.OUT, Pin.PULL_DOWN)
 
 
@@ -25,8 +25,8 @@ sensor = DHT11(pin)
 
 while True:
     
-    # Blink the lamp 3 times to confirm entering loop
-    blink_lamp(3, 0.1)
+    # Blink the lamp 1 time to confirm entering loop
+    blink_lamp(1, 0.1)
 
     time.sleep(2)
 
@@ -50,9 +50,11 @@ while True:
         # Send data to server
         data_transfer.send_data_to_server(temperature, humidity, current_time )
         print("- - - - - - - - - - - - - - - - - - - - - -")
-        time.sleep(5)
+        # Wait 15 minutes until next read
+        time.sleep(15*60)
     except Exception as e:
         print("An exception occurred:", e)
         print("Error reading sensor data, skipping data transfer")
         continue
+
 
