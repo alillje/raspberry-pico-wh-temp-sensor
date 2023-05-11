@@ -4,10 +4,12 @@ from dht import DHT11, InvalidChecksum, InvalidPulseCount
 import wifi_connector
 import data_transfer
 from blink import blink_lamp
+from umqtt.simple import MQTTClient
+
 
 # Connect to WiFi network
 try:
-    wifi_connector.connect_to_network("<wifi-ssid>", "<wifi-password>")    
+    wifi_connector.connect_to_network("Lillje-Luna", "santiagodechile")    
 except:
     print("An error occured connecting to wifi")
 
@@ -16,45 +18,65 @@ led = Pin("LED", Pin.OUT)
 
 
 # Blink the lamp 5 times to confirm startup
-blink_lamp(5, 1)
+blink_lamp(5, 0.3)
 pin = Pin(28, Pin.OUT, Pin.PULL_DOWN)
 
 
 sensor = DHT11(pin)
 
 
+# MQQT-settings
+
+# Fill in your Adafruit IO Authentication and Feed MQTT Topic details
+mqtt_host = "io.adafruit.com"
+mqtt_username = "username"  # Your Adafruit IO username
+mqtt_password = "key"  # Adafruit IO Key
+mqtt_publish_topic_temperature = "example/feeds/temperature" # Adafruit feed
+mqtt_publish_topic_humidity = "example/feeds/temperature" # Adafruit feed
+
+
+# Enter a random ID for this MQTT Client
+# It needs to be globally unique across all of Adafruit IO.
+mqtt_client_id = "8c48dc57-4c00-4b90-9f9a-f506f2c15463"
+
+# Initialize our MQTTClient and connect to the MQTT server
+mqtt_client = MQTTClient(
+        client_id=mqtt_client_id,
+        server=mqtt_host,
+        user=mqtt_username,
+        password=mqtt_password)
+
+mqtt_client.connect()
+
 while True:
-    
-    # Blink the lamp 1 time to confirm entering loop
-    blink_lamp(1, 0.1)
-
-    time.sleep(2)
-
     try:
-        # Get the temperatur and humidity
-        temperature = (sensor.temperature)
-        time.sleep(2)
-        humidity = (sensor.humidity)
+        # Measure temperature and humidity
+        sensor.measure()
+        temperature = sensor.temperature
+        humidity = sensor.humidity
         
-        # Get the current time from internet
-        current_time = wifi_connector.get_time_from_internet()
+        # Convert temperature and humidity to strings
+        temperature_str = str(temperature)
+        humidity_str = str(humidity)
 
-        # Log information about the data
-        print("Current time:", current_time)
-        print("Temperature: {}".format(temperature))
-        print("Humidity: {}".format(humidity))
-        
-        # Blink the lamp 2 times to confirm reading data
-        blink_lamp(2, 0.4)
-        
-        # Send data to server
-        data_transfer.send_data_to_server(temperature, humidity, current_time )
-        print("- - - - - - - - - - - - - - - - - - - - - -")
-        # Wait 15 minutes until next read
-        time.sleep(15*60)
+        # Publish the temperature payload to the Temperature MQTT topic
+        mqtt_client.publish(mqtt_publish_topic_temperature, temperature_str)
+        print(f'Temperature data successfully published: {temperature_str}')
+
+        # Publish the humidity payload to the Humidity MQTT topic
+        mqtt_client.publish(mqtt_publish_topic_humidity, humidity_str)
+        print(f'Humidity data successfully published: {humidity_str}')
+
+
+        # Blink the LED to indicate successful data transfer
+        blink_lamp(1, 0.1)
+
+        # Wait before the next measurement
+        time.sleep(3)
+
     except Exception as e:
-        print("An exception occurred:", e)
-        print("Error reading sensor data, skipping data transfer")
-        continue
-
+    # Blink the LED to 2 times indicate unsuccessful data transfer
+        blink_lamp(2, 0.2)
+        print(f'Failed to publish message: {e}')
+    continue
 
