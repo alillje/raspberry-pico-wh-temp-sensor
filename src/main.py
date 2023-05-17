@@ -6,37 +6,41 @@ from blink import blink_lamp
 from umqtt.simple import MQTTClient
 
 
-# Connect to WiFi network
+# Connect to WiFi network, provide credentials (SSID, Wi-FI password as arguments)
 try:
-    wifi_connector.connect_to_network("Lillje-Luna", "santiagodechile")    
+    wifi_connector.connect_to_network("WIFI SSID", "WIFI PASSWORD")    
 except:
     print("An error occured connecting to wifi")
 
 # Get the LED pin
 led = Pin("LED", Pin.OUT)
 
-
 # Blink the lamp 5 times to confirm startup
 blink_lamp(5, 0.3)
 pin = Pin(28, Pin.OUT, Pin.PULL_DOWN)
 
-
+# Initialize the DHT11 sensor
 sensor = DHT11(pin)
 
 
-# MQQT-settings
-
-# Fill in your Adafruit IO Authentication and Feed MQTT Topic details
+'''
+### MQQT-settings ###
+'''
+# Define Adafruit IO Authentication
 mqtt_host = "io.adafruit.com"
-mqtt_username = "alillje"  # Your Adafruit IO username
-mqtt_password = "aio_eTeQ95pjfZICOOYfoDBOEcLHj3Ki"  # Adafruit IO Key
-mqtt_publish_topic_temperature = "alillje/feeds/temperature"
-mqtt_publish_topic_humidity = "alillje/feeds/humidity"
+mqtt_username = "username"  # Adafruit IO username
+mqtt_password = "aio_SECRET_KEY"  # Adafruit IO Key
 
+# Feed MQTT Topic details
+# Publish topics
+mqtt_publish_topic_temperature = "example/feeds/temperature"
+mqtt_publish_topic_humidity = "example/feeds/humidity"
+
+# Subscribe topics
+mqtt_subscribe_topic_led = "example/feeds/led"
 
 # Enter a random ID for this MQTT Client
-# It needs to be globally unique across all of Adafruit IO.
-mqtt_client_id = "8c48dc57-4c00-4b90-9f9a-f506f2c15463"
+mqtt_client_id = "Unique client ID (Secret)"
 
 # Initialize our MQTTClient and connect to the MQTT server
 mqtt_client = MQTTClient(
@@ -47,8 +51,30 @@ mqtt_client = MQTTClient(
 
 mqtt_client.connect()
 
+# Function to handle incoming MQTT messages
+# Checks if "on" or "off" message has been published by the LED topic
+# That is subscribed to
+# Turns LED on/off, depending on message
+def handle_incoming_messages(topic, msg):
+    topic = topic.decode('utf-8')
+    msg = msg.decode('utf-8')
+    if topic == mqtt_subscribe_topic_led:
+        if msg == "on":
+            led.value(1)
+        elif msg == "off":
+            led.value(0)
+            
+# Register the message handler function
+mqtt_client.set_callback(handle_incoming_messages)
+
+# Subscribe to the LED topic
+mqtt_client.subscribe(mqtt_subscribe_topic_led)
+
 while True:
     try:
+        # Call mqtt_client.check_msg() to handle incoming messages
+        mqtt_client.check_msg()
+        
         # Measure temperature and humidity
         sensor.measure()
         temperature = sensor.temperature
@@ -66,16 +92,11 @@ while True:
         mqtt_client.publish(mqtt_publish_topic_humidity, humidity_str)
         print(f'Humidity data successfully published: {humidity_str}')
 
-
-        # Blink the LED to indicate successful data transfer
-        # blink_lamp(1, 0.1)
-
         # Wait before the next measurement
         time.sleep(5)
+        
         # Check for exceptions, and continue to try to avoid program to crash
     except Exception as e:
-    # Blink the LED to 2 times indicate unsuccessful data transfer
-        blink_lamp(2, 0.1)
         print(f'Failed to publish message: {e}')
     continue
 
