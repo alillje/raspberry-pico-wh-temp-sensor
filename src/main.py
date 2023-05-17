@@ -2,7 +2,6 @@ from machine import Pin
 import utime as time
 from dht import DHT11, InvalidChecksum, InvalidPulseCount
 import wifi_connector
-import data_transfer
 from blink import blink_lamp
 from umqtt.simple import MQTTClient
 
@@ -29,10 +28,10 @@ sensor = DHT11(pin)
 
 # Fill in your Adafruit IO Authentication and Feed MQTT Topic details
 mqtt_host = "io.adafruit.com"
-mqtt_username = "username"  # Your Adafruit IO username
-mqtt_password = "key"  # Adafruit IO Key
-mqtt_publish_topic_temperature = "example/feeds/temperature" # Adafruit feed
-mqtt_publish_topic_humidity = "example/feeds/temperature" # Adafruit feed
+mqtt_username = "alillje"  # Your Adafruit IO username
+mqtt_password = "aio_eTeQ95pjfZICOOYfoDBOEcLHj3Ki"  # Adafruit IO Key
+mqtt_publish_topic_temperature = "alillje/feeds/temperature"
+mqtt_publish_topic_humidity = "alillje/feeds/humidity"
 
 
 # Enter a random ID for this MQTT Client
@@ -69,14 +68,14 @@ while True:
 
 
         # Blink the LED to indicate successful data transfer
-        blink_lamp(1, 0.1)
+        # blink_lamp(1, 0.1)
 
         # Wait before the next measurement
-        time.sleep(3)
-
+        time.sleep(5)
+        # Check for exceptions, and continue to try to avoid program to crash
     except Exception as e:
     # Blink the LED to 2 times indicate unsuccessful data transfer
-        blink_lamp(2, 0.2)
+        blink_lamp(2, 0.1)
         print(f'Failed to publish message: {e}')
     continue
 
