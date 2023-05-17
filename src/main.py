@@ -81,17 +81,17 @@ while True:
         temperature = sensor.temperature
         humidity = sensor.humidity
         
-        # Convert temperature and humidity to strings
-        temperature_str = str(temperature)
-        humidity_str = str(humidity)
+        # Prepare data as json objects
+        temp_data = json.dumps({"value": temperature})
+        humidity_data = json.dumps({"value": humidity})
 
         # Publish the temperature payload to the Temperature MQTT topic
-        mqtt_client.publish(mqtt_publish_topic_temperature, temperature_str)
-        print(f'Temperature data successfully published: {temperature_str}')
+        mqtt_client.publish(mqtt_publish_topic_temperature, temp_data)
+        print(f'Temperature data successfully published: {temp_data}')
 
         # Publish the humidity payload to the Humidity MQTT topic
-        mqtt_client.publish(mqtt_publish_topic_humidity, humidity_str)
-        print(f'Humidity data successfully published: {humidity_str}')
+        mqtt_client.publish(mqtt_publish_topic_humidity, humidity_data)
+        print(f'Humidity data successfully published: {humidity_data}')
 
         # Wait before the next measurement
         time.sleep(5)
@@ -101,4 +101,3 @@ while True:
         print(f'Failed to publish message: {e}')         
         time.sleep(5)
     continue
-
