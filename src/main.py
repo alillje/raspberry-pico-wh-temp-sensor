@@ -5,10 +5,9 @@ import wifi_connector
 from blink import blink_lamp
 from umqtt.simple import MQTTClient
 
-
 # Connect to WiFi network, provide credentials (SSID, Wi-FI password as arguments)
 try:
-    wifi_connector.connect_to_network("WIFI SSID", "WIFI PASSWORD")    
+    wifi_connector.connect_to_network("Lillje-Luna", "santiagodechile")    
 except:
     print("An error occured connecting to wifi")
 
@@ -28,28 +27,30 @@ sensor = DHT11(pin)
 '''
 # Define Adafruit IO Authentication
 mqtt_host = "io.adafruit.com"
-mqtt_username = "username"  # Adafruit IO username
-mqtt_password = "aio_SECRET_KEY"  # Adafruit IO Key
+mqtt_username = "alillje"  # Adafruit IO username
+mqtt_password = "aio_yBMK24M3XTBy3rjXviMoQDq2xnyK"  # Adafruit IO Key
 
 # Feed MQTT Topic details
 # Publish topics
-mqtt_publish_topic_temperature = "example/feeds/temperature"
-mqtt_publish_topic_humidity = "example/feeds/humidity"
+mqtt_publish_topic_temperature = "alillje/feeds/temperature"
+mqtt_publish_topic_humidity = "alillje/feeds/humidity"
 
 # Subscribe topics
-mqtt_subscribe_topic_led = "example/feeds/led"
+mqtt_subscribe_topic_led = "alillje/feeds/led"
 
 # Enter a random ID for this MQTT Client
-mqtt_client_id = "Unique client ID (Secret)"
-
+mqtt_client_id = "8c48dc57-4c00-4b90-9f9a-f506f2d15463"
 # Initialize our MQTTClient and connect to the MQTT server
 mqtt_client = MQTTClient(
         client_id=mqtt_client_id,
         server=mqtt_host,
         user=mqtt_username,
         password=mqtt_password)
+try:
+    mqtt_client.connect()
+except Exception as e:
+    print(f'Failed to connect to MQTT server: {e}')
 
-mqtt_client.connect()
 
 # Function to handle incoming MQTT messages
 # Checks if "on" or "off" message has been published by the LED topic
@@ -97,6 +98,7 @@ while True:
         
         # Check for exceptions, and continue to try to avoid program to crash
     except Exception as e:
-        print(f'Failed to publish message: {e}')
+        print(f'Failed to publish message: {e}')         
+        time.sleep(5)
     continue
 
