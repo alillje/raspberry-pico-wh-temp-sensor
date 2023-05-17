@@ -74,8 +74,9 @@ Explain all material that is needed. All sensors, where you bought them and thei
 
 ### Putting everything together
 
-**Circuit Diagram**
+#### **Circuit Diagram**
 ![Diagram](./img/iot-diagram.png)
+
 The fourth PIN on the DHT11 is not used. 
 
 The DHT11 sensor is connected to the Raspberry Pi Pico WH as follows:
@@ -92,46 +93,108 @@ This setup is suitable for a development environment. However, for a production 
 
 ### Platform
 
-Describe your choice of platform. If you have tried different platforms, it can be good to provide a comparison.
+#### **Data Visualization**
+Once the data is sent to Adafruit, I can visualize it in real time using Adafruit Dashboards. This is a cloud-based service that allows me to create custom dashboards to display my sensor data. I also set up a feed that my Raspberry Pi Pico WH subscribes to, allowing it to listen for "on" and "off" messages and control an LED accordingly.
 
-Is your platform based on a local installation or a cloud? Do you plan to use a paid subscription or a free one? Describe the alternatives going forward if you want to scale your idea.
+#### **Web Application**
+In addition to the Adafruit Dashboards, I also created a web application to display the current temperature and humidity in my house. I wrote a web server in .NET/C# that uses the Adafruit API to retrieve the latest sensor data. I then created a user interface that communicates with my web server to display this data to the end user. The web server is hosted on an Ubuntu virtual machine provided by my school, and the web application is hosted on Netlify.
 
-- [ ] Describe platform in terms of functionality
-- [ ] *Explain and elaborate on what made you choose this platform
+#### **Choice of Platform**
+I chose these platforms because they provided the functionality I needed and were relatively easy to use. I initially tried sending the data directly from the device to the web server via HTTP, but this proved to be more work than necessary. By using MQTT and Adafruit, I was able to simplify the data transmission process and focus on the core functionality of my project.
+
+Currently, I'm using the free tier of Adafruit's MQTT service. If I were to scale this project in the future, I might consider upgrading to a paid subscription to get access to more features and higher data limits. However, the free tier is sufficient for my current needs.
 
 ### The code
 
 Import core functions of your code here, and don't forget to explain what you have done! Do not put too much code here. Focus on the core functionalities. Have you done a specific function that does a calculation, or are you using a clever function for sending data on two networks? Or, are you checking if the value is reasonable, etc.? Explain what you have done, including the setup of the network, wireless, libraries and all that is needed to understand.
 
 ```python=
-import this as that
 
-def my_cool_function():
-    print('not much here')
+# main.py
 
-s.send(package)
+def handle_incoming_messages(topic, msg):
+    topic = topic.decode('utf-8')
+    msg = msg.decode('utf-8')
+    if topic == mqtt_subscribe_topic_led:
+        if msg == "on":
+            led.value(1)
+        elif msg == "off":
+            led.value(0)
 
-# Explain your code!
+
+# This function is used to handle incoming MQTT messages. It checks if the received message is an "on" or "off" command for the LED. If it is, it turns the LED on or off accordingly. This allows you to control the LED remotely via MQTT.
+
+    except Exception as e:
+        print(f'Failed to publish message: {e}')
+    continue
+
+# The except Exception as e: line catches any type of exception. By doing this, it prevents the program from crashing when an error occurs. Instead, it prints an error message to the console and then continues the execution of the program.
 ```
+
+```python=
+
+# wifi_connector.py
+```python
+import network
+import urequests
+
+# The script begins by importing two modules: network and urequests. The network module is used to configure the WiFi connection, while urequests is used to make HTTP requests to test the internet connection.
+
+def connect_to_network(ssid, password):
+
+# The connect_to_network function is defined with two parameters: ssid and password. These are the credentials for the WiFi network that the device will connect to.
+
+wlan = network.WLAN(network.STA_IF)
+wlan.active(True)
+
+# A WLAN object is created and activated. network.STA_IF indicates that the device should operate as a station (i.e., a client) in the network.
+
+if wlan.isconnected():
+    print("Already connected to a network.")
+    response = urequests.get("http://www.google.com")
+    if response.status_code == 200:
+        print("Internet connection successful!")
+    else:
+        print("Failed to connect to Google. Please check your internet connection.")
+    return
+
+# The script checks if the device is already connected to a network. If it is, it makes an HTTP GET request to Google to test the internet connection. If the status code of the response is 200, it means the request was successful, and the internet connection is working. If not, an error message is printed.
+
+```
+
+There is more code to explain. I have left plenty of comments in the original source code to explain and motivate the execution.
+
 
 ### Data flow / Connectivity
 
-How is the data transmitted to the internet or local server? Describe the package format. All the different steps that are needed in getting the data to your end-point. Explain both the code and choice of wireless protocols and API information models, if any.
+In this project, the data is transmitted from the Raspberry Pi Pico WH to the Adafruit MQTT broker over the internet. Here's a detailed explanation of the process:
 
-- [ ] How often is the data sent?
-- [ ] Which wireless protocols did you use (WiFi, LoRa, etc ...)?
-- [ ] Which transport protocols were used (MQTT, webhook, etc ...)
-- [ ] Which information models were used (WoT TD, Fiware, etc...)
-- [ ] *Elaborate on the design choices regarding data transmission and wireless protocols. That is how your choices affect the device range and battery consumption.
+#### **Data Collection**: The DHT11 sensor measures the temperature and humidity. This data is then read by the Raspberry Pi Pico WH using the MicroPython code.
+
+#### **Wireless Protocol**: The Raspberry Pi Pico WH is connected to a WiFi network. WiFi was chosen as the wireless protocol due to its widespread availability, high data rates, and sufficient range for this indoor application.
+
+#### **Data Transmission Frequency**: The data is sent every 5 seconds. This frequency was chosen as a balance between providing real-time updates and conserving power.
+
+#### **Transport Protocol**: The data is sent using MQTT (Message Queuing Telemetry Transport), a lightweight messaging protocol designed for devices with limited processing power and low-bandwidth, high-latency networks. MQTT was chosen for its simplicity, efficiency, and reliability.
+
+#### **Data Format**: The temperature and humidity data is converted into strings and published as separate messages to the MQTT broker. Each message contains the topic (either "temperature" or "humidity") and the corresponding measurement.
+
+Server: The MQTT broker used is provided by Adafruit. It's a cloud-based service that receives the MQTT messages and makes the data available for real-time visualization on Adafruit Dashboards.
+
+Information Model: There isn't a specific information model used in this project like WoT TD or Fiware. The data is simply sent as raw sensor readings.
+
+The choice of WiFi and MQTT was primarily driven by their suitability for this application. WiFi provides a reliable and high-speed connection for indoor use, and MQTT is a lightweight and efficient protocol that's well-suited for IoT applications.
 
 ### Presenting the data
+#### **Adafruit Dashboard**
+![Adafruit Dashboard](./img/adafruit-dashboard.png)
 
-Describe the presentation part. How is the dashboard built? How long is the data preserved in the database?
 
-- [ ] Provide visual examples of how the dashboard looks. Pictures needed.
-- [ ] How often is data saved in the database.
-- [ ] *Explain your choice of database.
-- [ ] *Automation/triggers of the data.
+The Dashboard is build by creating blocks in the Adafruit IO Dashboards section. When creating a block you select the feed you want to visualize. 
+I chose to visualize the temperature and humidity in graphs for the last 24 hours. I also added a widget that displays the latest recorded temperature and humidity, presentating the current conditions. 
+
+Adafruit IO acts as the database in this setup. It's a time-series database, which is ideal for IoT applications where data is often timestamped. The choice of Adafruit IO simplifies the setup as it provides both the MQTT broker and the database in one service. The data is stored in the Adafruit IO cloud. With the free plan, data is stored for 30 days.
+
 
 ### Finalizing the design
 
