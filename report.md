@@ -200,6 +200,16 @@ Adafruit IO acts as the database in this setup. It's a time-series database, whi
 
 Show the final results of your project. Give your final thoughts on how you think the project went. What could have been done in another way, or even better? Some pictures are nice!
 
-- [ ] Show the final results of the project
-- [ ] Pictures
-- [ ] Video presentation of the project
+#### **Video Presentation**
+Video presentation available here: https://www.youtube.com/watch?v=tXvfTl5QowU
+
+#### **Web Applicaiton**
+Available at: https://myhometemperature.netlify.app/
+
+![IoT Web Application](./img/iot-web-app.png)
+
+
+#### **Adafruit Dashboard**
+I have made the adafruit dashboard public, but i cannot gurantee that the device is connected to power at the time of examination. Please refer to the video presentation for a demonstration. 
+
+https://io.adafruit.com/alillje/dashboards/temperature-slash-humidity
