@@ -7,7 +7,7 @@ from umqtt.simple import MQTTClient
 
 # Connect to WiFi network, provide credentials (SSID, Wi-FI password as arguments)
 try:
-    wifi_connector.connect_to_network("Lillje-Luna", "santiagodechile")    
+    wifi_connector.connect_to_network("wifi-name", "wifi-password")    
 except:
     print("An error occured connecting to wifi")
 
@@ -27,19 +27,19 @@ sensor = DHT11(pin)
 '''
 # Define Adafruit IO Authentication
 mqtt_host = "io.adafruit.com"
-mqtt_username = "alillje"  # Adafruit IO username
-mqtt_password = "aio_yBMK24M3XTBy3rjXviMoQDq2xnyK"  # Adafruit IO Key
+mqtt_username = "username"  # Adafruit IO username
+mqtt_password = "secret_key"  # Adafruit IO Key
 
 # Feed MQTT Topic details
 # Publish topics
-mqtt_publish_topic_temperature = "alillje/feeds/temperature"
-mqtt_publish_topic_humidity = "alillje/feeds/humidity"
+mqtt_publish_topic_temperature = "username/feeds/temperature"
+mqtt_publish_topic_humidity = "username/feeds/humidity"
 
 # Subscribe topics
-mqtt_subscribe_topic_led = "alillje/feeds/led"
+mqtt_subscribe_topic_led = "username/feeds/led"
 
 # Enter a random ID for this MQTT Client
-mqtt_client_id = "8c48dc57-4c00-4b90-9f9a-f506f2d15463"
+mqtt_client_id = "secret_unique_id"
 # Initialize our MQTTClient and connect to the MQTT server
 mqtt_client = MQTTClient(
         client_id=mqtt_client_id,
